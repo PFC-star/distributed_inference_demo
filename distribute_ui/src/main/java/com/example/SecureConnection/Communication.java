@@ -1,5 +1,7 @@
 package com.example.SecureConnection;
 import static com.example.distribute_ui.BackgroundService.TAG;
+
+import android.annotation.SuppressLint;
 import android.util.Log;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -273,7 +275,7 @@ public class Communication {
 
         OutputData.put(id, (byte[]) result[0]);
         long sTime = System.nanoTime();
-        addBytes((byte[]) result[0]);
+//        addBytes((byte[]) result[0]);
         long eTime = System.nanoTime();
 //        System.out.println("通信OutputData: " + result[0]);
         System.out.println("No." + id + " addBytes Time in seconds: " + (eTime - sTime) / 1000000000.0);
@@ -529,7 +531,26 @@ public class Communication {
             }
         }
     }
+    class loadModel implements Runnable{
+        public void run(){
+            //  设置当前线程的系统优先级为后台（可运行在安卓的小核）
+            android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
+            // 加载模型权重和tokenizer
+            long startTime = System.nanoTime();
+            Log.d(TAG, "load while inference");
+            createSession("/data/user/0/com.example.distribute_ui/files" + "/device/module.onnx");
 
+            System.out.println("load while inference Time: " + (System.nanoTime() - startTime) / 1000000000.0);
+
+//                Communication.tokenizer = createHuggingFaceTokenizer("/data/user/0/com.example.distribute_ui/files" + "/device/tokenizer.json");
+            // OR SENTENCEPIECE LATER
+
+
+
+
+
+        }
+    }
     class multiSteps implements Runnable {
         private Map<Integer, Socket> serverSocket;
         private Map<Integer, Socket> clientSocket;
@@ -550,20 +571,8 @@ public class Communication {
 
             this.latch = latch;
         }
-        public void loadModel(){
-            // 加载模型权重和tokenizer
+        @SuppressLint("SdCardPath")
 
-            Communication.sessions.add(createSession("/data/user/0/com.example.distribute_ui/files" + "/device/module.onnx"));
-
-
-
-                Communication.tokenizer = createHuggingFaceTokenizer("/data/user/0/com.example.distribute_ui/files" + "/device/tokenizer.json");
-                // OR SENTENCEPIECE LATER
-
-                Log.d(TAG, "load while inference");
-
-
-        }
 
 
         @Override
@@ -587,12 +596,23 @@ public class Communication {
                 int receivedId = sampleId;
 //                param.max_length=100;
                 int input_size = param.max_length;
+//                loadModel
+//
+
+                loadModel loadthread = new loadModel();
+                Thread thread = new Thread(loadthread);
+
+// 设置线程优先级为后台（小核）
+                thread.setPriority(Thread.MIN_PRIORITY);  // 这个是标准Java线程的优先级
+                thread.start();
+
 
                 for (int m = 0; m < param.max_length; m++) {
                     long startTime = System.nanoTime();
                     System.out.println("++++++++++++SampleID: " + sample_id + "++++++++++TokenID:" + m);
                     try {
-                        loadModel();
+
+
                         receivedId = new OneStep(this.sample_id, serverSocket, clientSocket).run();
 
                         if (cfg.isHeader()) {

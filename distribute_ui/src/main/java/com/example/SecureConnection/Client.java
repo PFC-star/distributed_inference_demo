@@ -204,7 +204,7 @@ public class Client {
             // Receive byte file
             try (FileOutputStream fos = new FileOutputStream(file)) {
                 byte[] chunk;
-                long  totalSize = 0;
+                int totalSize = 0;
                 while ((chunk = receiver.recv()) != null) {
                     fos.write(chunk);
                     totalSize += chunk.length;
@@ -263,11 +263,9 @@ public class Client {
 //            Log.d(TAG, "Load module " + i + " successfully");
 //        }
 
-        // 加载模型权重和tokenizer
-
         Communication.sessions.add(createSession(param.modelPath + "/device/module.onnx"));
         System.out.println("create session finished");
-        System.out.println(param.modelPath);
+
         if (cfg.isHeader() || cfg.isTailer()) {
             Communication.tokenizer = createHuggingFaceTokenizer(param.modelPath + "/device/tokenizer.json");
             // OR SENTENCEPIECE LATER
