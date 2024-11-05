@@ -191,7 +191,7 @@ class MonitorService : Service(), MonitorActions{
                 break
             }
             monitorSendCheck = ips.size - 1
-            getFlop()
+//            getFlop()
             getDeviceLatency()
             Log.d(mTAG, "the latency results: ${latencyArr!!.joinToString (", ")}")
             getAppRam()
