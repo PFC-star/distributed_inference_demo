@@ -359,6 +359,8 @@ public class Communication {
                         }
 
                         System.out.println("No." + id + " : "+result);
+                        System.out.println("InputData." + id + " : "+ InputData.get(id));
+
                         convertOutput(id, i, result);
                     }
                 }

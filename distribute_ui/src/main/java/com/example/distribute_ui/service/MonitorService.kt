@@ -252,11 +252,12 @@ class MonitorService : Service(), MonitorActions{
 
         } else {
 
-            println("Model Received")
+            println("Model Start Receive")
             Log.d(BackgroundService.TAG, "Model Received")
             clientInstance.receiveModelFile(flopBinPath, socket, true, 1024 * 1024)
             clientInstance.receiveModelFile(flopOnnxPath, socket, true, 1024 * 1024)
-//            if (cfg.isHeader) {
+            println("Model Received")
+        //            if (cfg.isHeader) {
 //                Log.d(TAG, "start receiving tokenizer");
 //                receiveModelFile(param.modelPath + "/device/tokenizer.json", receiver, chunk, 1024 * 1024);  // chunked 1MB
 //                System.out.println("Tokenizer Received");

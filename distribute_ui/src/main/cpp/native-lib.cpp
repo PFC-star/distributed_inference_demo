@@ -974,9 +974,10 @@ Java_com_example_SecureConnection_Communication_runInferenceMasterResidual(JNIEn
     // Converting jintArray to std::vector<int>
     jsize length = env->GetArrayLength(input_ids_j);
     jint *body = env->GetIntArrayElements(input_ids_j, 0);
+
     std::vector<int> input_ids(body, body + length);
     env->ReleaseIntArrayElements(input_ids_j, body, 0);
-
+    __android_log_print(ANDROID_LOG_DEBUG, "MyApp_Native", "input_ids_length: %zu", length);
 
     int model_num_flops = static_cast<int>(3140000000);
     double flops_per_second = inference::flop_per_second_estimation(model_num_flops,session_cache, ort_tensors, input_ids);
