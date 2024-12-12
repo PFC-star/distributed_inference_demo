@@ -25,6 +25,8 @@ val exampleModelName = listOf(
     "bloom1b7-int8",
     "bloom3b",
     "bloom3b-int8",
+    "bloom7b",
+    "bloom7b-int8",
 )
 
 val modelMap: HashMap<String, String> = hashMapOf(

@@ -845,49 +845,65 @@ public class Communication {
         public int run() throws RuntimeException, InterruptedException, JSONException {
             int receivedId = this.sample_id;
 
-            // 通信时间 1
-            long startTime = System.nanoTime();
-            receivedId = procssingAsClient(receivedId);
-            System.out.println("No." + receivedId + " Part1 Process Time: " + (System.nanoTime() - startTime) / 1000000000.0);
-            double commutime1 =(System.nanoTime() - startTime) / 1000000000.0;
-            System.out.println("No." + receivedId + " commutime1: " +commutime1);
-            commutimeArraySum.add(commutime1);
-            startTime = System.nanoTime();
+            try {
+                // 通信时间 1
+                long startTime = System.nanoTime();
+                receivedId = procssingAsClient(receivedId);
+                System.out.println("No." + receivedId + " Part1 Process Time: " + (System.nanoTime() - startTime) / 1000000000.0);
+                double commutime1 = (System.nanoTime() - startTime) / 1000000000.0;
+                System.out.println("No." + receivedId + " commutime1: " + commutime1);
+                commutimeArraySum.add(commutime1);
 
-            // 推理时间
-            inferenceProcedure(receivedId);
+                // 推理时间
+                startTime = System.nanoTime();
+                inferenceProcedure(receivedId);
+                System.out.println("No." + receivedId + " Part2 Process Time: " + (System.nanoTime() - startTime) / 1000000000.0);
+                double infertime = (System.nanoTime() - startTime) / 1000000000.0;
+                infertimeArraySum.add(infertime);
 
-            System.out.println("No." + receivedId + " Part2 Process Time: " + (System.nanoTime() - startTime) / 1000000000.0);
-            infertime =(System.nanoTime() - startTime) / 1000000000.0;
-            infertimeArraySum.add(infertime);
+                // 通信时间 2
+                startTime = System.nanoTime();
+                processAsServer(receivedId);
+                double commutime2 = (System.nanoTime() - startTime) / 1000000000.0;
+                System.out.println("No." + receivedId + " commutime2: " + commutime2);
+                commutimeArraySum.add(commutime2);
 
+                // 通信时间 3
+                startTime = System.nanoTime();
+                receivedId = obtainResultsFromTailer(receivedId);
+                double commutime3 = (System.nanoTime() - startTime) / 1000000000.0;
+                System.out.println("No." + receivedId + " commutime3: " + commutime3);
+                commutimeArraySum.add(commutime3);
 
-            // 通信时间 2
-            startTime = System.nanoTime();
+                System.out.println("No." + receivedId + " Commu Time: " + (commutime1 + commutime2 + commutime3));
+                System.out.println("No." + receivedId + " Infer Time: " + infertime);
 
+                return receivedId;
 
-            processAsServer(receivedId);
-            double commutime2 =(System.nanoTime() - startTime) / 1000000000.0;
-            System.out.println("No." + receivedId + " commutime2: " +commutime2);
-            commutimeArraySum.add(commutime2);
-
-            System.out.println("No." + receivedId + " Part3 Process Time: " + (System.nanoTime() - startTime) / 1000000000.0);
-
-            startTime = System.nanoTime();
-
-            // 通信时间 3
-            receivedId = obtainResultsFromTailer(receivedId);
-            double commutime3 =(System.nanoTime() - startTime) / 1000000000.0;
-            System.out.println("No." + receivedId + " commutime3: " +commutime3);
-            commutimeArraySum.add(commutime3);
-            System.out.println("No." + receivedId + " Part4 Process Time: " + (System.nanoTime() - startTime) / 1000000000.0);
-
-
-            System.out.println("No." + receivedId + " Commu Time: " +commutime1+commutime2+commutime3);
-            System.out.println("No." + receivedId + " Infer Time: " +infertime);
-//            System.out.println("No." + receivedId + " Commu msg: " +byteArraySum);
-//            System.out.println("No." + receivedId + " Commu msg size: " +byteArraySum.size());
-
+            } catch (JSONException e) {
+                System.err.println("JSON parsing error occurred: " + e.getMessage());
+                e.printStackTrace();
+                // Handle specific JSONException recovery
+            } catch (InterruptedException e) {
+                System.err.println("Operation was interrupted: " + e.getMessage());
+                e.printStackTrace();
+                // Handle specific InterruptedException recovery
+            } catch (RuntimeException e) {
+                System.err.println("Runtime exception occurred: " + e.getMessage());
+                e.printStackTrace();
+                // Handle unexpected runtime exceptions
+            } catch (Exception e) {
+                System.err.println("Unexpected exception occurred: " + e.getMessage());
+                e.printStackTrace();
+                // Handle general exceptions
+            } catch (Error e) {
+                System.err.println("Serious error occurred: " + e.getMessage());
+                e.printStackTrace();
+                // Handle critical errors
+            } finally {
+                // Ensure any necessary cleanup happens here
+                System.out.println("Completed processing for receivedId: " + receivedId);
+            }
 
             return receivedId;
         }
