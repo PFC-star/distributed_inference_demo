@@ -83,7 +83,7 @@ public class Communication {
         public String task_type;
         public boolean skip_special_token;
         public int corePoolSize;
-
+        public int num_device;
         public String[] classes;
 
         public volatile String status = "Ready";
@@ -274,11 +274,11 @@ public class Communication {
     public void convertOutput(int id, int module_idx, Object[] result){
 
         OutputData.put(id, (byte[]) result[0]);
-        long sTime = System.nanoTime();
-//        addBytes((byte[]) result[0]);
-        long eTime = System.nanoTime();
-//        System.out.println("通信OutputData: " + result[0]);
-        System.out.println("No." + id + " addBytes Time in seconds: " + (eTime - sTime) / 1000000000.0);
+//        long sTime = System.nanoTime();
+////        addBytes((byte[]) result[0]);
+//        long eTime = System.nanoTime();
+////        System.out.println("通信OutputData: " + result[0]);
+//        System.out.println("No." + id + " addBytes Time in seconds: " + (eTime - sTime) / 1000000000.0);
 
         JSONObject resIndex = null;
         if (sendIndex.get(sessionIndex[module_idx]).size() > 1)
@@ -568,6 +568,7 @@ public class Communication {
                 System.out.println("Waiting for an element from the sockets queue...");
                 e.printStackTrace();
             }
+//
             this.clientSocket = sockets.get(0);
             this.serverSocket = sockets.get(1);
 
@@ -917,8 +918,8 @@ public class Communication {
             ArrayList<Map<Integer, Socket>> socketContainer = new ArrayList<>();
             Map<Integer, Socket> SendSocket = new HashMap<>();
             for (Integer idx : sendDeviceIndex) {
-                Socket temp = beServer.establish_connection(context, SocketType.ROUTER, Config.port + j*i + (idx-cfg.deviceId));
-                temp.setIdentity(("ROUTER Send From " + cfg.deviceId + " to " + idx + "." + (Config.port + j*i + (idx-cfg.deviceId))).getBytes());
+                Socket temp = beServer.establish_connection(context, SocketType.ROUTER, Config.port + j * i + (idx - cfg.deviceId));
+                temp.setIdentity(("ROUTER Send From " + cfg.deviceId + " to " + idx + "." + (Config.port + j * i + (idx - cfg.deviceId))).getBytes());
                 SendSocket.put(idx, temp);
             }
 

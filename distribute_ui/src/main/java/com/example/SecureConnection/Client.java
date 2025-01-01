@@ -79,7 +79,7 @@ public class Client {
                     receiveSeqLength(param,receiver);
 
                     receiveDependencyMap(receiver);
-
+                    receiveNumdevice(param,receiver);
                     Log.d(TAG, "open status receive info finished");
                 }
 
@@ -355,6 +355,17 @@ public class Client {
             Log.d(TAG, "Dependency Map JSON EXCEPTION");
         }
         Log.d(TAG, "Get Dependency Map");
+    }
+    private void receiveNumdevice(Communication.Params param, Socket receiver) {
+        // Receive Max length for generation task, 0 for classification task
+        try {
+            byte[] num_device = receiver.recv(0);
+            param.num_device = Integer.parseInt(new String(num_device));
+        } catch (NumberFormatException nfe) {
+//            System.out.println("max_length is not Integer");
+            Log.d(TAG, "num_device is not Integer");
+        }
+        Log.d(TAG, "Get num_device: " + param.num_device);
     }
 
     public void closeSockets(ArrayList<Map<Integer, Socket>> sockets) {

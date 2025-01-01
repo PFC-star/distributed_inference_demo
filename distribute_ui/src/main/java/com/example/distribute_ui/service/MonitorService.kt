@@ -247,16 +247,16 @@ class MonitorService : Service(), MonitorActions{
 //        val trans = String(socket.recv(0))
         var trans = "False"
         if (trans == "False") {  // Skip the model, causing model exists
-            println("Model Exists")
-            Log.d(BackgroundService.TAG, "Model Exists")
+            println("Flops Model Exists")
+            Log.d(BackgroundService.TAG, "Flops Model Exists")
 
         } else {
 
-            println("Model Start Receive")
-            Log.d(BackgroundService.TAG, "Model Received")
+            println("Flops Model Start Receive")
+            Log.d(BackgroundService.TAG, " Flops Model Received")
             clientInstance.receiveModelFile(flopBinPath, socket, true, 1024 * 1024)
             clientInstance.receiveModelFile(flopOnnxPath, socket, true, 1024 * 1024)
-            println("Model Received")
+            println("Flops Model Received")
         //            if (cfg.isHeader) {
 //                Log.d(TAG, "start receiving tokenizer");
 //                receiveModelFile(param.modelPath + "/device/tokenizer.json", receiver, chunk, 1024 * 1024);  // chunked 1MB

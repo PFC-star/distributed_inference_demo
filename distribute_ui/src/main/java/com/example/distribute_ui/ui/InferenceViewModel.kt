@@ -41,7 +41,8 @@ class InferenceViewModel(application: Application) : AndroidViewModel(applicatio
     private var updatingDecodedString: Boolean = false
     private var decodedStringIndex: Int = -1
     private var previousSampleID: Int = 0
-    val modelAuhthor = "LinguaLinked"
+    var num_device: Int = 2
+    val modelAuhthor = "StarDusts"
 
     init {
         // Observe decodedStringLiveData from data repository

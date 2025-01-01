@@ -66,6 +66,7 @@ public class LoadBalance {
 
             }});
             // Add next device
+//            这里可以添加一个设备哦
             if (!cfg.isTailer)
                 com.sendDeviceIndex.add(cfg.nextDeviceId());
 

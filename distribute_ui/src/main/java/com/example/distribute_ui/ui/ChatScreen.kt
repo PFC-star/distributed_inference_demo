@@ -79,11 +79,13 @@ fun ChatScreen(
     modifier: Modifier = Modifier
 ) {
     val authorMe = stringResource(R.string.author_me)
+
     val scrollState = rememberLazyListState()
     val topBarState = rememberTopAppBarState()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(topBarState)
     val scope = rememberCoroutineScope()
     val uiState = viewModel.uiState.collectAsState()
+    val num_device = viewModel.num_device
     val sampleId by viewModel.sampleId.observeAsState(0)
     Scaffold(
         topBar = {
@@ -97,8 +99,13 @@ fun ChatScreen(
                             style = MaterialTheme.typography.titleMedium
                         )
                         // Show greeting text
+//                        Text(
+//                            text = "Welcome to StarDusts.",
+//                            style = MaterialTheme.typography.bodySmall,
+//                            color = MaterialTheme.colorScheme.onSurfaceVariant
+//                        )
                         Text(
-                            text = "Welcome to LinguaLinked Inference.",
+                            text = "Online device num:$num_device",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )

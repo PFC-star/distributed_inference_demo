@@ -16,5 +16,6 @@ data class Messaging(
     val author: String,
     val content: String,
     val timestamp: String,
-    val image: Int? = null
+    val image: Int? = null,
+    val num_device :Int? = null
 )

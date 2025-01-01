@@ -4,14 +4,17 @@
     <selectionStates>
       <SelectionState runConfigName="distribute_ui">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2024-12-11T15:49:54.938916Z">
+        <DropdownSelection timestamp="2025-01-01T16:21:46.631124Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="PhysicalDevice" identifier="serial=62f93c4f" />
+              <DeviceId pluginId="PhysicalDevice" identifier="serial=3486383340001F5" />
             </handle>
           </Target>
         </DropdownSelection>
         <DialogSelection />
+      </SelectionState>
+      <SelectionState runConfigName="NodeSelectionScreenPreview">
+        <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>
   </component>
