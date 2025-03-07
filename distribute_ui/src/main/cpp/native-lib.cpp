@@ -979,9 +979,9 @@ Java_com_example_SecureConnection_Communication_runInferenceMasterResidual(JNIEn
     env->ReleaseIntArrayElements(input_ids_j, body, 0);
     __android_log_print(ANDROID_LOG_DEBUG, "MyApp_Native", "input_ids_length: %zu", length);
 
-    int model_num_flops = static_cast<int>(3140000000);
-    double flops_per_second = inference::flop_per_second_estimation(model_num_flops,session_cache, ort_tensors, input_ids);
-    __android_log_print(ANDROID_LOG_DEBUG, "MyApp_Native", "flops_per_second: %f", flops_per_second);
+//    int model_num_flops = static_cast<int>(3140000000);
+//    double flops_per_second = inference::flop_per_second_estimation(model_num_flops,session_cache, ort_tensors, input_ids);
+//    __android_log_print(ANDROID_LOG_DEBUG, "MyApp_Native", "flops_per_second: %f", flops_per_second);
     auto result = inference::run_inference(session_cache, ort_tensors, input_ids);
     if (result.empty()){
         throw std::runtime_error("inference master has empty ort_tensor logit.");

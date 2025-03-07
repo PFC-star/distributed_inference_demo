@@ -63,7 +63,7 @@ public class Config {
         this.isTailer = tailer;
     }
 
-    private String getCurrentDeviceIP() {
+    public String getCurrentDeviceIP() {
         try {
             for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
                 NetworkInterface networkInterface = en.nextElement();

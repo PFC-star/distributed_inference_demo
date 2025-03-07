@@ -32,7 +32,7 @@ import org.json.JSONObject;
 import com.example.SecureConnection.Utils.LBPause;
 import com.example.distribute_ui.DataRepository;
 import java.util.ArrayList;
-
+import com.example.SecureConnection.HeartbeatSender;
 
 import static com.example.distribute_ui.BackgroundService.TAG;
 
@@ -108,7 +108,7 @@ public class Communication {
     public String[] InputString;
     public volatile Map<Integer, ArrayList<Integer>> InputIds;
     public volatile Map<Integer, byte[]> InputData;
-    public volatile Map<Integer, byte[]> OutputData;
+    public volatile Map<Integer, byte[]> OutputData; //放着header的输出结果，并发送给了worker，worker放在了inputdata里，然后推理，推理结果写在了outputdata里，然后返回到inputIDs
     public volatile Map<Integer, Map<String, ArrayList<byte[]>>> ResidualDataFromDevice;
     public volatile Map<Integer, Map<String , ArrayList<byte[]>>> ResidualDataToDevice;
     public volatile Map<Integer, byte[]> logits;
@@ -154,7 +154,7 @@ public class Communication {
         context = new ZContext();
         beClient = new Client();
         beServer = new Server();
-
+//        HeartbeatSender heartbeatSender = new HeartbeatSender();
         allSockets = new LinkedBlockingQueue<>();
 //        serverSockets = new LinkedBlockingQueue<>();
 //        clientSockets = new LinkedBlockingQueue<>();
@@ -227,6 +227,7 @@ public class Communication {
     public void cleanUpBuffer(int id) {
 //        ResidualDataToDevice.remove(id);
 //        ResidualDataFromDevice.remove(id);
+
         InputData.remove(id);
         OutputData.remove(id);
     }
@@ -274,11 +275,11 @@ public class Communication {
     public void convertOutput(int id, int module_idx, Object[] result){
 
         OutputData.put(id, (byte[]) result[0]);
-//        long sTime = System.nanoTime();
-////        addBytes((byte[]) result[0]);
-//        long eTime = System.nanoTime();
-////        System.out.println("通信OutputData: " + result[0]);
-//        System.out.println("No." + id + " addBytes Time in seconds: " + (eTime - sTime) / 1000000000.0);
+        long sTime = System.nanoTime();
+//        addBytes((byte[]) result[0]);
+        long eTime = System.nanoTime();
+        System.out.println("通信OutputData: " + result[0]);
+        System.out.println("No." + id + " addBytes Time in seconds: " + (eTime - sTime) / 1000000000.0);
 
         JSONObject resIndex = null;
         if (sendIndex.get(sessionIndex[module_idx]).size() > 1)
@@ -314,9 +315,14 @@ public class Communication {
                 if (cfg.isHeader()) {
                     System.out.println("Inference on Master");
                     for (int i = 0;  i< sessions.size(); i++){
+                        System.out.println("sessions.size() header"+sessions.size());
                         int[] to_send_seq_indices = Utils.JsonArray2IntArray(sendIndex.get(sessionIndex[i]).get(0).getJSONArray(String.valueOf(Integer.parseInt(sessionIndex[i]) + 1)));
                         if (i == 0) {
-                            result = ((Object[]) runInferenceMasterResidual(sessions.get(i), Utils.convertArrayListToIntArray(InputIds.get(id)), to_send_seq_indices, getResIndices(i)));
+//                             只使用最后一个 token
+                            ArrayList<Integer> inputIds = InputIds.get(id);
+                            int[] currentToken = new int[]{inputIds.get(inputIds.size() - 1)};
+                            result = ((Object[]) runInferenceMasterResidual(sessions.get(i), currentToken, to_send_seq_indices, getResIndices(i)));
+//                            result = ((Object[]) runInferenceMasterResidual(sessions.get(i), Utils.convertArrayListToIntArray(InputIds.get(id)), to_send_seq_indices, getResIndices(i)));
                         } else {
                             result = ((Object[]) runInferenceWorkerResidual(sessions.get(i), OutputData.get(id), mergeResFromAndToDevice(id, sessionIndex[i]), to_send_seq_indices, getResIndices(i)));
                         }
@@ -790,10 +796,11 @@ public class Communication {
                         clientSocket.send(decode_id, 0);
                         System.out.println("No. " + receivedId + "worker发送结束" );
 
-                    } else {
-                        System.out.println("No. " + receivedId + "worker开始发送" );
+                    }
+                    else {
+                        System.out.println("No. " + receivedId + "header开始发送数据" );
                         clientSocket.send(OutputData.get(receivedId), 0);
-                        System.out.println("No. " + receivedId + "worker发送结束" );
+                        System.out.println("No. " + receivedId + "header结束发送数据" );
                         System.out.println("OutputData:"+OutputData.get(receivedId));
 //                        System.out.println("OutputData:"+ Arrays.toString(OutputData.get(receivedId)));
 //                        System.out.println("OutputData:"+ new String(OutputData.get(receivedId)));
@@ -849,29 +856,36 @@ public class Communication {
             try {
                 // 通信时间 1
                 long startTime = System.nanoTime();
+                System.out.println("No." + receivedId + "commu 1 start");
                 receivedId = procssingAsClient(receivedId);
-                System.out.println("No." + receivedId + " Part1 Process Time: " + (System.nanoTime() - startTime) / 1000000000.0);
+                System.out.println("No." + receivedId + "commu 1 end");
                 double commutime1 = (System.nanoTime() - startTime) / 1000000000.0;
                 System.out.println("No." + receivedId + " commutime1: " + commutime1);
+
                 commutimeArraySum.add(commutime1);
 
                 // 推理时间
                 startTime = System.nanoTime();
+                System.out.println("No." + receivedId + "infer  start");
                 inferenceProcedure(receivedId);
-                System.out.println("No." + receivedId + " Part2 Process Time: " + (System.nanoTime() - startTime) / 1000000000.0);
+                System.out.println("No." + receivedId + "infer  end");
                 double infertime = (System.nanoTime() - startTime) / 1000000000.0;
                 infertimeArraySum.add(infertime);
 
                 // 通信时间 2
                 startTime = System.nanoTime();
+                System.out.println("No." + receivedId + "commu 2 start");
                 processAsServer(receivedId);
+                System.out.println("No." + receivedId + "commu 2 end");
                 double commutime2 = (System.nanoTime() - startTime) / 1000000000.0;
                 System.out.println("No." + receivedId + " commutime2: " + commutime2);
                 commutimeArraySum.add(commutime2);
 
                 // 通信时间 3
                 startTime = System.nanoTime();
+                System.out.println("No." + receivedId + "commu 3 start");
                 receivedId = obtainResultsFromTailer(receivedId);
+                System.out.println("No." + receivedId + "commu 3 end");
                 double commutime3 = (System.nanoTime() - startTime) / 1000000000.0;
                 System.out.println("No." + receivedId + " commutime3: " + commutime3);
                 commutimeArraySum.add(commutime3);

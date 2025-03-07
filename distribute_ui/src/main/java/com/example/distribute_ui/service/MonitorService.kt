@@ -478,7 +478,7 @@ class MonitorService : Service(), MonitorActions{
         val actualDuration = System.currentTimeMillis() - start
         Log.d(mTAG, "bandwidth transmit time is: $actualDuration")
         Log.d(mTAG, "bytesread is: $bytesRead")
-        val bandwidth = bytesRead / actualDuration // MB per second
+        val bandwidth = bytesRead / actualDuration // Bytes/ms
         Log.d(mTAG, "bandwidth calcaulation: " + bandwidth)
         if (bandwidthArr != null) {
             Log.d(mTAG, "bandwidthArr: " + bandwidthArr)

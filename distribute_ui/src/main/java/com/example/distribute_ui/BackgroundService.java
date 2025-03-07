@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.Properties;
-
+import com.example.SecureConnection.HeartbeatSender;
 public class BackgroundService extends Service {
     public static double[] results;
     public static final String TAG = "Lingual_backend";
@@ -87,6 +87,7 @@ public class BackgroundService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "background service started");
+
         int id = 0;
         if (intent != null && intent.hasExtra("role")) {
             id = intent.getIntExtra("role", 0);
@@ -95,7 +96,7 @@ public class BackgroundService extends Service {
             role = "header";
         }
         Log.d(TAG, "role is " + role);
-
+//        HeartbeatSender.heartrun();
         String modelName = "";
         if (intent != null && intent.hasExtra("model")) {
             modelName = intent.getStringExtra("model");
@@ -113,6 +114,7 @@ public class BackgroundService extends Service {
 
             Communication com = new Communication(cfg);
             Communication.loadBalance = new LoadBalance(com, cfg);
+
             com.param.modelPath = getFilesDir() + "";
 
             // 1. send IP to server to request model
