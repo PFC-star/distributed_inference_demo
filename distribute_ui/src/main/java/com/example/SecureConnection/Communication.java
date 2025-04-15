@@ -120,6 +120,7 @@ public class Communication {
 
     public ZContext context;
     public Socket rootSocket;
+    public Socket commuSocket;
     public Client beClient;
     public Server beServer;
     public LinkedBlockingQueue<ArrayList<Map<Integer, Socket>>> allSockets;
@@ -170,7 +171,7 @@ public class Communication {
     }
 
     public boolean sendIPToServer(String role, String modelRequest) throws JSONException {
-        rootSocket = beClient.establish_connection(context, SocketType.DEALER, cfg.rootPort, cfg.root);
+        rootSocket   = beClient.establish_connection(context, SocketType.DEALER, cfg.rootPort, cfg.root);
         Log.d(TAG, "socket establish connection");
         String currentIP = Config.local;
         JSONObject jsonObject = new JSONObject();
@@ -217,7 +218,8 @@ public class Communication {
         System.out.println(cfg.root);
         System.out.println(cfg.rootPort);
         Log.d(TAG, "root IP: " + cfg.root +  " ,root port: " + cfg.rootPort);
-        beClient.communicationOpenClose(cfg, this, rootSocket);
+        commuSocket = beClient.establish_connection(context, SocketType.DEALER, 34567, cfg.root);
+        beClient.communicationOpenClose(cfg, this, commuSocket);
         long prepareTime = System.nanoTime();
         System.out.println("Prepare Time in seconds: " + (prepareTime - startTime) / 1000000000.0);
         Log.d(TAG, "Prepare Time in seconds: " + (prepareTime - startTime) / 1000000000.0);
